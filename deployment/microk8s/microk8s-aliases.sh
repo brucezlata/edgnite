@@ -3,4 +3,6 @@
 # alias h='microk8s helm3'" >> ~/.bash_aliases
 # source ~/.bash_aliases
 
+sudo snap install microk8s --classic
+
 sudo snap alias microk8s.kubectl kubectl

@@ -1,0 +1,64 @@
+version: "0.1"
+name: "edgnite"
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - edgnite-iot
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+  
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    restart: always
+    ports:
+      - "8086:8086"
+    networks:
+      - edgnite-iot
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=edgnite
+      - DOCKER_INFLUXDB_INIT_PASSWORD=edgnite0512
+      - DOCKER_INFLUXDB_INIT_ORG=edgnite_org
+      - DOCKER_INFLUXDB_INIT_BUCKET=edgnite_iot_data
+  
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: always
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - mosquitto
+      - influxdb
+    networks:
+      - edgnite-iot
+  
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - edgnite-iot
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+networks:
+  edgnite-iot:
+
+volumes:
+  influxdb-data:
+  grafana-data:
+  influxdb-config:
