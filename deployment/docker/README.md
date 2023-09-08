@@ -1,6 +1,11 @@
 ## Docker network for multiples container exchanging data
 `docker network create edgnite-iot`
 
+## Init secrets for influx db
+```
+echo fill_your_password > influx_user_password.txt
+echo fill_your_token > influx_token.txt
+```
 ## Ignite docker containers
 - docker compose up  
 `docker-compose up -d` 

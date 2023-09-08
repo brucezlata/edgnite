@@ -26,15 +26,20 @@ services:
       - influxdb-config:/etc/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=[USERNAME]
-      - DOCKER_INFLUXDB_INIT_PASSWORD=[PASSWORD]
+      - DOCKER_INFLUXDB_INIT_USERNAME=edgnite
+      - DOCKER_INFLUXDB_INIT_PASSWORD=/run/secrets/influx_user_password
       - DOCKER_INFLUXDB_INIT_ORG=edgnite_org
       - DOCKER_INFLUXDB_INIT_BUCKET=edgnite_iot_data
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=[TOKEN]
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=/run/secrets/influx_token
+    secrets:
+      - influx_user_password
+      - influx_token
   
   telegraf:
     image: telegraf
     container_name: telegraf
+    secrets:
+      - influx_token
     restart: always
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
@@ -60,6 +65,11 @@ services:
 networks:
   edgnite-iot:
 
+secrets:
+  influx_token:
+    file: influx_token.txt
+  influx_user_password:
+    file: influx_user_password.txt
 volumes:
   influxdb-data:
   grafana-data:
